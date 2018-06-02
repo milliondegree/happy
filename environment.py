@@ -51,11 +51,11 @@ class happy(object):
                 if len(index_list) >= 3:
                     print 'target node: ', (i, j), ' target number: ', self.map[i, j], 'target area: ', len(index_list)
                     column_dict = self.singleupdate(index_list)
-                    self.is_visited = np.zeros((self.H, self.W), dtype=bool)
                     print self.map
+                    self.allsearch()
 
 
-    def singleupdate(self, index_list, command_index=None):
+    def singleupdate(self, index_list, command_index=None, if_add=True):
         # sort the index_list and make the column dictionary
         index_list = sorted(index_list, key=lambda ele:ele[1])
         columns = set(zip(*index_list)[1])
@@ -77,10 +77,11 @@ class happy(object):
             left_list = column_dict[left_column]
             target = left_list[0]
 
-        column_dict[target[1]].remove(target)
 
         # update
-        self.map[target] += 1
+        if if_add:
+            column_dict[target[1]].remove(target)
+            self.map[target] += 1
         for c in columns:
             if len(column_dict[c]) == 0:
                 continue
@@ -102,5 +103,5 @@ class happy(object):
 
 
 if __name__ == '__main__':
-    env = happy(5, 5, 9, 1234)
+    env = happy(5, 5, 5, 1234)
     env.allsearch()
