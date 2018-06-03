@@ -225,3 +225,4 @@ def _get_bilinear_filter(filter_shape, upscale_factor):
     bilinear_weights = tf.get_variable(name="decon_bilinear_filter", initializer=init,
                        shape=weights.shape)
     return bilinear_weights
+
