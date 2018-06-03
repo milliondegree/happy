@@ -4,8 +4,9 @@ import time
 
 class happy(object):
 
-    def __init__(self, H, W, max_num, seed):
-        np.random.seed(seed)
+    def __init__(self, H, W, max_num, seed = None):
+	if seed:
+	   np.random.seed(seed)
         self.H = H
         self.W = W
         self.max_num = max_num
@@ -43,7 +44,7 @@ class happy(object):
         self.map[index] += 1
         self.life -= 1
         print 'pressing at ', index
-        print self.map
+        print self.map, 'life:', self.life, 'points:', self.points, '\n'
         self.is_visited = np.zeros((self.H, self.W), dtype=bool)
         index_list = []
         self.dsp(index[0], index[1], self.map[index], index_list)
@@ -52,11 +53,10 @@ class happy(object):
             if self.life < 5:
                 self.life += 1
             self.singleupdate(index_list, command_index=index)
-            print self.map, ' happy at ', index, 'life: ', self.life, 'points: ', self.points, '\n'
+            print self.map, 'happy at', index, ' life:', self.life, ' points:', self.points, '\n'
             self.allsearch()
         else:
-            print 'life: ', self.life, 'points: ', self.points
-
+            print 'life:', self.life, 'points:', self.points
 
 
     def allsearch(self, if_init=False):
@@ -76,7 +76,7 @@ class happy(object):
                         if self.life < 5:
                             self.life += 1
                         index = self.singleupdate(index_list)
-                        print self.map, 'happy at ', index, 'life: ', self.life, 'points: ', self.points, '\n'
+                        print self.map, 'happy at ', index, 'life:', self.life, 'points:', self.points, '\n'
                         self.allsearch()
                     # when initializing, we do not need to add the increase the value
                     else:
@@ -125,13 +125,20 @@ class happy(object):
         return target
 
 
-    def feedempty(self, column_dict):
-        for c in column_dict:
-            for node in column_dict[c]:
-                self.map[node] = np.random.choice(self.sample_pool)
+    def step(self, action):
+        pre_points = self.points
+	self.singlesearch(action)
+	reward = self.points - pre_points
+	state = self.map
+	if self.life == 0:
+	    done = True
+	else:
+	    done = False
+	return s_, reward, done
 
-    def step(self):
-        pass
+    def render(self):
+	time.sleep(0.1)
+	print self.map, '\n'
 
 
 if __name__ == '__main__':
