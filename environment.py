@@ -48,7 +48,7 @@ class happy(object):
         index_list = []
         self.dsp(index[0], index[1], self.map[index], index_list)
         if len(index_list) >= 3:
-            self.points += self.map[i, j] * len(index_list)
+            self.points += self.map[i, j] * len(index_list) * 10
             if self.life < 5:
                 self.life += 1
             self.singleupdate(index_list, command_index=index)
@@ -72,7 +72,7 @@ class happy(object):
                 if len(index_list) >= 3:
                     if not if_init:
                         # arranging points and lifes
-                        self.points += self.map[i, j] * len(index_list)
+                        self.points += self.map[i, j] * len(index_list) * 10
                         if self.life < 5:
                             self.life += 1
                         index = self.singleupdate(index_list)
@@ -100,7 +100,8 @@ class happy(object):
 
         # find the target node
         if command_index:
-            target = command_index
+            target_column = command_index[1]
+            target = column_dict[target_column][0]
         else:
             left_column = index_list[0][1]
             left_list = column_dict[left_column]
