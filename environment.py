@@ -5,8 +5,8 @@ import time
 class happy(object):
 
     def __init__(self, H, W, max_num, seed = None):
-	if seed:
-	   np.random.seed(seed)
+        if seed:
+            np.random.seed(seed)
         self.H = H
         self.W = W
         self.max_num = max_num
@@ -15,16 +15,22 @@ class happy(object):
             weight = self.max_num-i+1
             self.sample_pool = np.concatenate((self.sample_pool, np.ones((weight, self.H, self.W))*i), axis=0)
         self.sample_pool = self.sample_pool.reshape(-1)
+        self.action_space = []
+        for i in range(H):
+            for j in range(W):
+                self.action_space.append((i, j))
         self.reset()
 
 
     def reset(self):
+        self.steps = 0
         self.points = 0
         self.life = 5
         self.map = np.random.choice(self.sample_pool, self.W*self.H).reshape(self.W, self.H)
-        self.allsearch(if_init=True)
+        _ = self.allsearch(if_init=True)
         print 'initialization succeeded! '
         print self.map, '\n'
+        return np.concatenate([self.map.reshape(-1), np.array([self.life])], axis=0)
 
 
     def dsp(self, i, j, num, index_list):
@@ -41,6 +47,7 @@ class happy(object):
 
 
     def singlesearch(self, index):
+        self.steps += 1
         self.map[index] += 1
         self.life -= 1
         print 'pressing at ', index
@@ -49,14 +56,17 @@ class happy(object):
         index_list = []
         self.dsp(index[0], index[1], self.map[index], index_list)
         if len(index_list) >= 3:
-            self.points += self.map[i, j] * len(index_list) * 10
+            self.points += self.map[index] * len(index_list) * 10
             if self.life < 5:
                 self.life += 1
             self.singleupdate(index_list, command_index=index)
             print self.map, 'happy at', index, ' life:', self.life, ' points:', self.points, '\n'
-            self.allsearch()
+            combo = self.allsearch()+1
         else:
             print 'life:', self.life, 'points:', self.points
+            combo = 0
+        print 'combo:', combo
+        return combo
 
 
     def allsearch(self, if_init=False):
@@ -77,11 +87,12 @@ class happy(object):
                             self.life += 1
                         index = self.singleupdate(index_list)
                         print self.map, 'happy at ', index, 'life:', self.life, 'points:', self.points, '\n'
-                        self.allsearch()
+                        return self.allsearch()+1
                     # when initializing, we do not need to add the increase the value
                     else:
                         _ = self.singleupdate(index_list, if_add=False)
-                        self.allsearch(if_init=True)
+                        return self.allsearch(if_init=True)+1
+        return 0
 
 
     def singleupdate(self, index_list, command_index=None, if_add=True):
@@ -127,18 +138,19 @@ class happy(object):
 
     def step(self, action):
         pre_points = self.points
-	self.singlesearch(action)
-	reward = self.points - pre_points
-	state = self.map
-	if self.life == 0:
-	    done = True
-	else:
-	    done = False
-	return s_, reward, done
+        combo = self.singlesearch(self.action_space[action])
+        reward = self.points - pre_points
+        s_ = np.concatenate([self.map.reshape(-1), np.array([self.life])], axis=0)
+        if self.life == 0:
+            done = True
+            reward = -100000+self.points
+        else:
+            done = False
+        return s_, reward, done
 
     def render(self):
-	time.sleep(0.1)
-	print self.map, '\n'
+        time.sleep(0.1)
+        print self.map, '\n'
 
 
 if __name__ == '__main__':
@@ -149,7 +161,7 @@ if __name__ == '__main__':
         i = int(l[0])
         j = int(l[-1])
         if i>=0 and i<env.H and j>=0 and j<env.W:
-            env.singlesearch((i, j))
+            combo = env.singlesearch((i, j))
         else:
             print 'input error!'
             break
