@@ -122,6 +122,8 @@ class DeepQNetwork:
                 b3 = tf.get_variable('b3', [1, self.n_actions], initializer=b_initializer, collections=c_names)
                 self.q_next = tf.matmul(l2, w3) + b3
 
+        self.saver = tf.train.Saver()
+
 
     def store_transition(self, s, a, r, s_):
         if not hasattr(self, 'memory_counter'):
@@ -218,6 +220,7 @@ class DeepQNetwork:
         plt.ylabel('Cost')
         plt.xlabel('training steps')
         plt.show()
+
 
 
 

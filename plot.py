@@ -21,7 +21,30 @@ def drawlineplot(npfile):
     plt.savefig(Save_Path+'/'+name+'.jpg')
     print 'saving '+name+' succeeded!'
 
+
+def multidraw(np_list, name):
+    x_list = []
+    y_list = []
+    for npf in np_list:
+        d = np.load(Base_Path+'/'+npf)
+        x_list.append(d['x'])
+        y_list.append(d['y'])
+    p_list = zip(x_list, y_list)
+
+    plt.figure()
+    for x, y in p_list:
+        plt.plot(x, y)
+    plt.xlabel('games')
+    plt.ylabel('points')
+    plt.title('points during training')
+    plt.savefig(Save_Path+'/'+name+'.jpg')
+    print 'saving '+name+' succeeded!'
+
+
+
 if __name__ == "__main__":
+    multidraw(['v100000.npz', 'random.npz'], 'contrast')
+    exit(0)
     import inspect, sys
     current_module = sys.modules[__name__]
     funnamelst = [item[0] for item in inspect.getmembers(current_module, inspect.isfunction)]
