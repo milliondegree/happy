@@ -1,0 +1,10 @@
+Tue, 05 Jun 2018 17:40:16 train.py[line:33] INFO random seed: 1234
+Tue, 05 Jun 2018 17:40:17 train.py[line:67] INFO game 0 finished, points: 1150
+Tue, 05 Jun 2018 17:40:17 train.py[line:67] INFO game 11 finished, points: 1600
+Tue, 05 Jun 2018 17:40:17 train.py[line:67] INFO game 12 finished, points: 1870
+Tue, 05 Jun 2018 17:40:18 train.py[line:67] INFO game 25 finished, points: 1930
+Tue, 05 Jun 2018 17:40:18 train.py[line:67] INFO game 59 finished, points: 3250
+Tue, 05 Jun 2018 17:40:19 train.py[line:67] INFO game 70 finished, points: 4420
+Tue, 05 Jun 2018 17:40:20 train.py[line:67] INFO game 194 finished, points: 4430
+Tue, 05 Jun 2018 17:40:20 train.py[line:67] INFO game 221 finished, points: 6060
+Tue, 05 Jun 2018 17:40:21 train.py[line:67] INFO game 255 finished, points: 6730
