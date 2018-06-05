@@ -31,6 +31,7 @@ def dqn_train():
         filemode='w'
         )
     logging.info('random seed: %d' % args.seed)
+    logging.info('learning rate :%f' % args.learning_rate)
 
     env = happy(args.height, args.width, args.max_num, args.seed)
     dqn = DeepQNetwork(25, 26,
@@ -50,7 +51,7 @@ def dqn_train():
         obz = env.reset()
         while True:
             action = dqn.choose_action(obz)
-            obz_, reward, done = env.step(action)
+            obz_, reward, done = env.step(action, max_points)
             dqn.store_transition(obz, action, reward, obz_)
             if steps>200 and steps%5==0:
                 dqn.learn()
@@ -66,7 +67,8 @@ def dqn_train():
                     print 'game %d done, points: %d' % (e, env.points)
                     logging.info('game %d finished, points: %d' % (e, env.points))
                     max_points = env.points
-                    dqn.saver.save(dqn.sess, './save/'+args.model_name+'_best')
+                    if e > 10000:
+                        dqn.saver.save(dqn.sess, './save/'+args.model_name+'_best')
                 break
 
     if not os.path.exists('./plot/npz'):

@@ -143,14 +143,14 @@ class happy(object):
         return target
 
 
-    def step(self, action):
+    def step(self, action, target):
         pre_points = self.points
         combo = self.singlesearch(self.action_space[action])
         reward = self.points - pre_points
         s_ = np.concatenate([self.map.reshape(-1), np.array([self.life])], axis=0)
         if self.life == 0:
             done = True
-            reward = -10000+self.points
+            reward = -target*2+self.points
         else:
             done = False
         return s_, reward, done
