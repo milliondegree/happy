@@ -4,12 +4,13 @@ import time
 
 class happy(object):
 
-    def __init__(self, H, W, max_num, seed = None):
+    def __init__(self, H, W, max_num, seed=None, verbose=False):
         if seed:
             np.random.seed(seed)
         self.H = H
         self.W = W
         self.max_num = max_num
+        self.verbose = verbose
         self.sample_pool = np.empty((0, self.H, self.W), dtype='uint8')
         for i in range(1, self.max_num+1):
             weight = self.max_num-i+1
@@ -28,8 +29,9 @@ class happy(object):
         self.life = 5
         self.map = np.random.choice(self.sample_pool, self.W*self.H).reshape(self.W, self.H)
         _ = self.allsearch(if_init=True)
-        print 'initialization succeeded! '
-        print self.map, '\n'
+        if self.verbose:
+            print 'initialization succeeded! '
+            print self.map, '\n'
         return np.concatenate([self.map.reshape(-1), np.array([self.life])], axis=0)
 
 
@@ -50,8 +52,9 @@ class happy(object):
         self.steps += 1
         self.map[index] += 1
         self.life -= 1
-        print 'pressing at ', index
-        print self.map, 'life:', self.life, 'points:', self.points, '\n'
+        if self.verbose:
+            print 'pressing at ', index
+            print self.map, 'life:', self.life, 'points:', self.points, '\n'
         self.is_visited = np.zeros((self.H, self.W), dtype=bool)
         index_list = []
         self.dsp(index[0], index[1], self.map[index], index_list)
@@ -60,12 +63,15 @@ class happy(object):
             if self.life < 5:
                 self.life += 1
             self.singleupdate(index_list, command_index=index)
-            print self.map, 'happy at', index, ' life:', self.life, ' points:', self.points, '\n'
+            if self.verbose:
+                print self.map, 'happy at', index, ' life:', self.life, ' points:', self.points, '\n'
             combo = self.allsearch()+1
         else:
-            print 'life:', self.life, 'points:', self.points
+            if self.verbose:
+                print 'life:', self.life, 'points:', self.points
             combo = 0
-        print 'combo:', combo
+        if self.verbose:
+            print 'combo:', combo
         return combo
 
 
@@ -86,7 +92,8 @@ class happy(object):
                         if self.life < 5:
                             self.life += 1
                         index = self.singleupdate(index_list)
-                        print self.map, 'happy at ', index, 'life:', self.life, 'points:', self.points, '\n'
+                        if self.verbose:
+                            print self.map, 'happy at ', index, 'life:', self.life, 'points:', self.points, '\n'
                         return self.allsearch()+1
                     # when initializing, we do not need to add the increase the value
                     else:
@@ -143,7 +150,7 @@ class happy(object):
         s_ = np.concatenate([self.map.reshape(-1), np.array([self.life])], axis=0)
         if self.life == 0:
             done = True
-            reward = -100000+self.points
+            reward = -10000+self.points
         else:
             done = False
         return s_, reward, done
