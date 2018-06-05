@@ -1,5 +1,6 @@
 from environment import happy
 from DeepQNet import DeepQNetwork
+from plot import *
 import argparse
 import logging
 import os
@@ -47,7 +48,7 @@ def dqn_train():
             obz = obz_
             steps += 1
             if done:
-                if e % 10:
+                if e % 10 == 0:
                     x_list.append(e)
                     y_list.append(env.points)
                 if env.points > max_points:
@@ -62,5 +63,36 @@ def dqn_train():
     print max_points
 
 
+
+def random_game():
+    # random game
+    args = get_argument()
+    x_list = []
+    y_list = []
+    max_points = 0
+    env = happy(args.height, args.width, args.max_num, args.seed)
+    for e in range(100000):
+        env.reset()
+        while True:
+            action = np.random.randint(0, args.height*args.width)
+            obz_, reward, done = env.step(action)
+            if done:
+                if e % 10 == 0:
+                    x_list.append(e)
+                    y_list.append(env.points)
+                if env.points > max_points:
+                    print 'game %d done, points: %d' % (e, env.points)
+                    max_points = env.points
+                break
+    if not os.path.exists(Base_Path):
+        os.makedirs(Base_Path)
+    np.savez(Base_Path+'/'+args.model_name+'.npz', x=np.array(x_list), y=np.array(y_list))
+    print 'random game over'
+    print max_points
+    drawlineplot(args.model_name+'.npz')
+
+
+
+
 if __name__ == '__main__':
-    dqn_train()
+    random_game()
