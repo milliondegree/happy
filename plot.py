@@ -33,6 +33,9 @@ def multidraw(np_list, name):
 
     plt.figure()
     for x, y in p_list:
+        points = zip(x, y)
+        points = [point for point in points if point[1]>10000]
+        x, y = zip(*points)
         plt.plot(x, y)
     plt.xlabel('games')
     plt.ylabel('points')
@@ -43,7 +46,7 @@ def multidraw(np_list, name):
 
 
 if __name__ == "__main__":
-    multidraw(['v100000.npz', 'random.npz'], 'contrast')
+    multidraw(['v1.npz', 'lr.npz', 'v10e6.npz'], 'contrast3')
     exit(0)
     import inspect, sys
     current_module = sys.modules[__name__]
