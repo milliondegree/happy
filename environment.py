@@ -11,11 +11,6 @@ class happy(object):
         self.W = W
         self.max_num = max_num
         self.verbose = verbose
-        self.sample_pool = np.empty((0, self.H, self.W), dtype='uint8')
-        for i in range(1, self.max_num+1):
-            weight = self.max_num-i+1
-            self.sample_pool = np.concatenate((self.sample_pool, np.ones((weight, self.H, self.W))*i), axis=0)
-        self.sample_pool = self.sample_pool.reshape(-1)
         self.action_space = []
         for i in range(H):
             for j in range(W):
@@ -27,6 +22,8 @@ class happy(object):
         self.steps = 0
         self.points = 0
         self.life = 5
+        self.current_max = self.max_num
+        self.reset_samplepool()
         self.map = np.random.choice(self.sample_pool, self.W*self.H).reshape(self.W, self.H)
         _ = self.allsearch(if_init=True)
         if self.verbose:
@@ -34,6 +31,17 @@ class happy(object):
             print self.map, '\n'
         return np.concatenate([self.map.reshape(-1), np.array([self.life])], axis=0)
 
+    def set(self, state):
+        self.steps = 0
+        self.points = 0
+        self.life = state[-1]
+        self.map = state[0:-1].reshape(self.H, self.W)
+        self.current_max = self.map.max()
+        self.reset_samplepool()
+        _ = self.allsearch(if_init=True)
+        if self.verbose:
+            print 'setting state succeeded! '
+            print self.map, '\n'
 
     def dsp(self, i, j, num, index_list):
         if i<0 or j<0 or i>=self.H or j>=self.W or self.is_visited[i, j]:
@@ -143,9 +151,19 @@ class happy(object):
         return target
 
 
+    def reset_samplepool(self):
+        self.sample_pool = np.empty((0, self.H, self.W), dtype='uint8')
+        for i in range(1, self.current_max+1):
+            weight = self.current_max-i+1
+            self.sample_pool = np.concatenate((self.sample_pool, np.ones((weight, self.H, self.W))*i), axis=0)
+        self.sample_pool = self.sample_pool.reshape(-1)
+
+
     def step(self, action, target):
         pre_points = self.points
         combo = self.singlesearch(self.action_space[action])
+        if self.map.max() > self.current_max:
+            self.reset_samplepool()
         reward = self.points - pre_points
         s_ = np.concatenate([self.map.reshape(-1), np.array([self.life])], axis=0)
         if self.life == 0:
@@ -161,7 +179,7 @@ class happy(object):
 
 
 if __name__ == '__main__':
-    env = happy(5, 5, 5, 1234)
+    env = happy(5, 5, 5, 1234, verbose=True)
     while env.life > 0:
         s = raw_input('input index:')
         l = list(s)
